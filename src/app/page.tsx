@@ -34,7 +34,7 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center justify-center">
         <div className="absolute inset-0">
           <Image
-            src={getPlaceholderImage("Hero Image")}
+            src="/images/hero.jpg"
             alt="Hero"
             fill
             priority
