@@ -6,7 +6,7 @@ import { getPlaceholderImage } from "@/lib/utils"
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion"
 import { Plus, Sparkles } from "lucide-react"
 import Image from "next/image"
-import { useState } from "react"
+import { memo, useCallback, useState } from "react"
 
 interface ProductCardProps {
   name: string
@@ -31,19 +31,19 @@ interface ProductCardProps {
   }
 }
 
-export function ProductCard(props: ProductCardProps) {
+export const ProductCard = memo(function ProductCard(props: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  // Mouse position for gradient effect
+  // Mouse position for gradient effect - only enable on desktop
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  function onMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+  const onMouseMove = useCallback(({ currentTarget, clientX, clientY }: React.MouseEvent) => {
     const { left, top } = currentTarget.getBoundingClientRect()
     mouseX.set(clientX - left)
     mouseY.set(clientY - top)
-  }
+  }, [])
 
   const background = useMotionTemplate`radial-gradient(
     400px circle at ${mouseX}px ${mouseY}px,
@@ -51,30 +51,8 @@ export function ProductCard(props: ProductCardProps) {
     transparent 80%
   )`
 
-  // Get current image based on selections
-  const getDisplayImage = () => {
-    // If no image provided or image is missing, return placeholder
-    if (!props.image || props.image === "") {
-      return getPlaceholderImage()
-    }
-
-    // Check if variant has image
-    if (props.variants) {
-      const firstVariant = Object.keys(props.variants)[0]
-      if (props.variants[firstVariant].image) {
-        return props.variants[firstVariant].image || getPlaceholderImage()
-      }
-      // Check if variant has flavors with images
-      if (props.variants[firstVariant].flavors) {
-        const firstFlavor = Object.keys(props.variants[firstVariant].flavors!)[0]
-        if (props.variants[firstVariant].flavors![firstFlavor].image) {
-          return props.variants[firstVariant].flavors![firstFlavor].image || getPlaceholderImage()
-        }
-      }
-    }
-
-    return props.image
-  }
+  // Get current image based on selections - memoized
+  const displayImage = getDisplayImage(props)
 
   return (
     <>
@@ -90,7 +68,7 @@ export function ProductCard(props: ProductCardProps) {
         {/* Card Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl" />
         <motion.div
-          className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition duration-300 group-hover:opacity-100 hidden sm:block"
           style={{ background }}
         />
 
@@ -105,11 +83,12 @@ export function ProductCard(props: ProductCardProps) {
           <div className="aspect-square overflow-hidden">
             <motion.div className="relative w-full h-full">
               <Image
-                src={getDisplayImage()}
+                src={displayImage}
                 alt={props.name}
                 fill
                 className="object-cover transition-transform duration-500"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                quality={85}
               />
             </motion.div>
             <motion.div
@@ -120,12 +99,12 @@ export function ProductCard(props: ProductCardProps) {
           </div>
 
           {/* Product Info */}
-          <div className="absolute inset-0 p-6 flex flex-col justify-end">
-            <div className="space-y-4">
+          <div className="absolute inset-0 p-4 sm:p-6 flex flex-col justify-end">
+            <div className="space-y-3 sm:space-y-4">
               {/* Title and Price */}
               <div className="flex justify-between items-start">
                 <motion.h3
-                  className="text-xl font-bold text-white"
+                  className="text-base sm:text-xl font-bold text-white"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
@@ -136,18 +115,18 @@ export function ProductCard(props: ProductCardProps) {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                 >
-                  <span className="text-lg font-bold gradient-text-primary">
+                  <span className="text-base sm:text-lg font-bold gradient-text-primary">
                     ₱{props.basePrice}
                   </span>
                   {props.variants && (
-                    <span className="block text-xs text-orange-400/80">Multiple options</span>
+                    <span className="block text-[10px] sm:text-xs text-orange-400/80">Multiple options</span>
                   )}
                 </motion.div>
               </div>
 
-              {/* Description */}
+              {/* Description - Only show on hover for mobile */}
               <motion.p
-                className="text-sm text-gray-300 line-clamp-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
+                className="text-xs sm:text-sm text-gray-300 line-clamp-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hidden sm:block"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
@@ -161,8 +140,8 @@ export function ProductCard(props: ProductCardProps) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/20">
-                    <Sparkles className="w-3 h-3" />
+                  <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/20">
+                    <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     {props.requiredAddons ? "Add-ons Required" : "Customizable"}
                   </span>
                 </motion.div>
@@ -175,12 +154,12 @@ export function ProductCard(props: ProductCardProps) {
                 transition={{ delay: 0.1 }}
               >
                 <Button
-                  className="w-full gradient-primary gradient-primary-hover text-white border-0"
-                  size="lg"
+                  className="w-full gradient-primary gradient-primary-hover text-white border-0 h-10 sm:h-12"
+                  size="default"
                   onClick={() => setIsDialogOpen(true)}
                 >
-                  <span>Add to Cart</span>
-                  <Plus className="w-4 h-4 ml-2" />
+                  <span className="text-sm sm:text-base">Add to Cart</span>
+                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-2" />
                 </Button>
               </motion.div>
             </div>
@@ -196,4 +175,29 @@ export function ProductCard(props: ProductCardProps) {
       />
     </>
   )
+})
+
+// Memoized helper function
+const getDisplayImage = (props: ProductCardProps): string => {
+  // If no image provided or image is missing, return placeholder
+  if (!props.image || props.image === "") {
+    return getPlaceholderImage()
+  }
+
+  // Check if variant has image
+  if (props.variants) {
+    const firstVariant = Object.keys(props.variants)[0]
+    if (props.variants[firstVariant].image) {
+      return props.variants[firstVariant].image || getPlaceholderImage()
+    }
+    // Check if variant has flavors with images
+    if (props.variants[firstVariant].flavors) {
+      const firstFlavor = Object.keys(props.variants[firstVariant].flavors!)[0]
+      if (props.variants[firstVariant].flavors![firstFlavor].image) {
+        return props.variants[firstVariant].flavors![firstFlavor].image || getPlaceholderImage()
+      }
+    }
+  }
+
+  return props.image
 } 

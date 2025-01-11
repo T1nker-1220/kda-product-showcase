@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { getPlaceholderImage } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { ArrowRight, UtensilsCrossed } from "lucide-react"
 import Image from "next/image"
@@ -31,7 +30,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center">
+      <section className="relative min-h-[100svh] flex items-center justify-center">
         <div className="absolute inset-0">
           <Image
             src="/images/hero.jpg"
@@ -39,7 +38,9 @@ export default function Home() {
             fill
             priority
             className="object-cover"
-            sizes="100vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+            quality={85}
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-gray-900/90" />
         </div>
@@ -48,19 +49,25 @@ export default function Home() {
           animate="animate"
           variants={stagger}
           className="container mx-auto px-4 relative z-10 text-center"
+          layout
         >
           <div className="max-w-3xl mx-auto">
-            <motion.div variants={fadeIn} className="flex items-center justify-center gap-2 mb-6">
-              <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
-                <UtensilsCrossed size={24} className="text-white" />
+            <motion.div 
+              variants={fadeIn} 
+              className="flex items-center justify-center gap-2 mb-4 sm:mb-6"
+              layout
+            >
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full gradient-primary flex items-center justify-center">
+                <UtensilsCrossed size={20} className="text-white sm:size-6" />
               </div>
-              <span className="text-sm font-medium tracking-wider uppercase text-orange-400">
+              <span className="text-xs sm:text-sm font-medium tracking-wider uppercase text-orange-400">
                 Authentic Filipino Cuisine
               </span>
             </motion.div>
             <motion.h1 
               variants={fadeIn}
-              className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-8 leading-tight"
+              layout
             >
               Experience the{" "}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-600">
@@ -69,25 +76,39 @@ export default function Home() {
             </motion.h1>
             <motion.p 
               variants={fadeIn}
-              className="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed max-w-2xl mx-auto"
+              className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-8 sm:mb-12 leading-relaxed max-w-2xl mx-auto"
+              layout
             >
               Discover the rich flavors of Filipino comfort food at Kusina de Amadeo. 
               Made with love, served with pride.
             </motion.p>
-            <motion.div variants={fadeIn} className="flex gap-6 justify-center">
-              <Button size="lg" className="group h-14 px-8 text-lg" asChild>
+            <motion.div 
+              variants={fadeIn} 
+              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center"
+              layout
+            >
+              <Button 
+                size="lg" 
+                className="group h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg w-full sm:w-auto" 
+                asChild
+              >
                 <Link href="/menu">
                   View Menu
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="group h-14 px-8 text-lg" asChild>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="group h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg w-full sm:w-auto" 
+                asChild
+              >
                 <Link href="/about">Learn More</Link>
               </Button>
             </motion.div>
           </div>
         </motion.div>
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
     </div>
   )

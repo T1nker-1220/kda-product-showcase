@@ -14,21 +14,21 @@ The frontend of the Kusina de Amadeo app is built using **Next.js 14+** with a f
 
 ## Project Structure
 
-### Folder Structure Best practices
+### Folder Structure
 ```plaintext
 src/
 ├── app/
-│   ├── auth/
+│   ├── (auth)/
 │   │   └── login/
 │   │       └── page.tsx          # Login page (Google OAuth)
-│   ├── admin/
+│   ├── (admin)/
 │   │   ├── dashboard/
 │   │   │   └── page.tsx          # Admin dashboard
 │   │   ├── products/
 │   │   │   └── page.tsx          # Product management
 │   │   └── orders/
 │   │       └── page.tsx          # Order management
-│   ├── customer/
+│   ├── (customer)/
 │   │   ├── menu/
 │   │   │   └── page.tsx          # Customer menu (browse products)
 │   │   ├── cart/
